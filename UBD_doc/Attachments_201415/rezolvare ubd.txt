@@ -1,0 +1,43 @@
+
+
+1. sa se creeze un view deptview pe toate coloanele din tabela dept din userul curent
+apoi sa se arate din dictionar proprietarul, numele, tipul si data cand a fost creeat.
+
+create view dept_view as select * from dept;
+select * from dba_objects where object_name like 'dept_view';
+select owner, object_type, object_name, created from dba_objects where object_name like 'DEPT_VIEW';
+
+
+
+
+
+2. sa se faca o copie a tabelei emp, emp_new din userul curent si 
+sa se elimine coloana comm, si sa se verifice in dictionar noua structura
+
+create table emp_new as select * from emp;
+alter table emp_new drop column comm
+cascade constraints checkpoint 1000;
+
+select column_name, data_type from dba_tab_column where table_name = 'EMP_NEW';
+desc emp_new;
+
+
+
+
+3. in copia emp_new, dezactivati coloana job apoi activati-o la loc.
+
+alter table emp_new set unused column job cascade constraints;
+alter table emp_new add job varchar2(9);
+
+
+
+
+
+
+
+4. sa se aloce tabelei emp_new o extensie de 100k, in table space ul permanent
+aferent userului curent. 
+
+select property_value from database_properties where property_name like
+'DEFAULT%PERMANENT%TABLESPACE'; -> USERS
+alter table emp_new allocate extent (size 100k);

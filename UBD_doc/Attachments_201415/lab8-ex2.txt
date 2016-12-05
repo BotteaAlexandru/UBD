@@ -1,0 +1,11 @@
+
+2. copiati tabelul dept in dept1
+   adaugati coloana telefon in dept1
+   aratati din dictionar structura coloanei.
+
+create table dept1 as select * from dept;
+select * from dept1;
+alter table scott.dept1 add telefon varchar2(30);
+
+select owner, table_name, column_name, data_type from dba_tab_columns
+	where table_name='DEPT1';

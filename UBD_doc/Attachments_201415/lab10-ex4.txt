@@ -1,0 +1,3 @@
+select a.instance_name, b.index_name, b.table_name 
+	from dba_indexes b, v$instance a
+	where b.owner='SCOTT';

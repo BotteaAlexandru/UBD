@@ -1,0 +1,81 @@
+ 1.
+Sa se creeze un index pe coloanele id angajat , data angajarii din tabela emp 
+Sa se porneasca apoi monitorizarea indexului si sa se arate din dictionar numele indexului , tabela pe care este creat , si ora 
+si data la care a inceput monitorizarea
+
+
+CREATE INDEX emp_idx
+ON emp(empno,hiredate)
+PCTFREE 30
+STORAGE(INITIAL 200K NEXT 200K
+PCTINCREASE 0 MAXEXTENTS 50)
+TABLESPACE bd_data
+/
+
+ALTER INDEX emp_idx
+MONITORING USAGE
+
+SELECT  *
+      from v$object_usage
+
+
+
+2.Afisati din dictionar numele instantei curente , numele indexilor si tabelele pe care sunt creati pt userul curent
+
+
+SELECT  a. index_name, b.instance_name,  a.table_name from dba_indexes a, v$instance b
+              where a.instances=b.instance_number and owner='UBD1'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1. creare index emp8_idx pe coloanele emp_no si deptno din tabela emp8
+verif in dictionar componenta indexului
+
+create table emp8 as select * from emp
+
+CREATE INDEX emp8_idx
+ON emp(empno), emp(deptno)
+PCTFREE 30
+STORAGE(INITIAL 200K NEXT 200K
+PCTINCREASE 0 MAXEXTENTS 50)
+TABLESPACE pbd_data
+/
+
+SELECT  index_name, table_owner, table_name, column_name 
+          from dba_ind_columns 
+          where index_name='EMP8_IDX'
+/
+
+2. creare nou fis date ubd8 cu mar de 1m pt tablespace-ul curent;
+in acest fisier creare extensie 100k pt indexul emp8_idx
+
+alter tablespace pbd_data add datafile 'e:/DISK6/ubd8.dbf' size 1M
+/
+
+ALTER INDEX emp8_idx
+ALLOCATE EXTENT (SIZE 100K
+DATAFILE  'e:/DISK6/ubd8.dbf')
+/
+
+3. verif in dictionar nr de blocuri alocate indexului si ce procent din spatiul alocat este utilizate
+
+SELECT name, blocks, used_space/ btree_space *100
+           FROM index_stats
+/
+
+4. aflati din dictionari numele instantei curente, numele indecsilor si tabelele aferente
+
+SELECT  a. index_name, b.instance_name, a.index_type, a.table_name from dba_indexes a, v$instance b
+              where a.instances=b.instance_number and owner='UBD1'
+/

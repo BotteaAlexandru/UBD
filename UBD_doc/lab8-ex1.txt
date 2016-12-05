@@ -1,0 +1,6 @@
+
+1.lista cu tabelele userului curent, tablespace'ul in care e creat si owner:
+
+select owner, tablespace_name, table_name 
+	from dba_tables
+	where owner='SCOTT';

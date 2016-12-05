@@ -1,0 +1,3 @@
+ALTER TABLE scott.emp_test
+ALLOCATE EXTENT(SIZE 500K
+DATAFILE 'D:\app\Tablespaces\UBD1.DBF');

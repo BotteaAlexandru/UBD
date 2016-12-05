@@ -1,0 +1,23 @@
+Lab 6  - Segmente si blocuri
+
+
+1 select segment_name,segment_type, tablespace_name, blocks
+           from dba_segments where owner='SCOTT'and segment_type='INDEX'
+/
+
+2 select tablespace_name, sum(blocks)  from dba_free_space  
+where tablespace_name='PBD_DATA' 
+group by tablespace_name
+/
+
+3 create table emp_ubd as select * from emp;
+
+select owner,segment_name,segment_type, tablespace_name, blocks, extents
+           from dba_segments where segment_name='EMP_UBD' and segment_type='TABLE'
+/
+
+4  select tablespace_name,  sum(blocks) from dba_free_space where tablespace_name='PBD_DATA' group by tablespace_name
+/
+ drop table emp_ubd;
+
+ select tablespace_name,  sum(blocks) from dba_free_space where tablespace_name='PBD_DATA' group by tablespace_name

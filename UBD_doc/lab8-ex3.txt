@@ -1,0 +1,9 @@
+
+3. dezactivati coloana telefon si aratati din dictionar
+   cate coloane dezactivate are tabela dept.
+
+alter table scott.dept1
+set unused column telefon
+cascade constraints;
+
+select * from dba_unused_col_tabs where table_name='DEPT1';

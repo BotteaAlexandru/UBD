@@ -1,0 +1,13 @@
+CREATE TABLE emp1 AS SELECT * FROM emp;
+SELECT * FROM emp1;
+
+CREATE INDEX scott.emp1_idx
+ON scott.emp1(empno, deptno)
+PCTFREE 30
+STORAGE(INITIAL 200K NEXT 200K
+PCTINCREASE 0 MAXEXTENTS 50)
+TABLESPACE USERS;
+
+SELECT index_name, table_owner, table_name, column_name 
+FROM dba_ind_columns
+WHERE index_name='EMP1_IDX';

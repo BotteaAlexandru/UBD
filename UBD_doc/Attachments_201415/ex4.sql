@@ -1,0 +1,1 @@
+select owner, table_name from dba_part_tables where owner='SYSTEM';

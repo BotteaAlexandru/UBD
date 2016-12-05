@@ -1,0 +1,4 @@
+ANALYZE INDEX emp1_idx VALIDATE STRUCTURE;
+
+SELECT name, blocks, pct_used
+FROM index_stats;

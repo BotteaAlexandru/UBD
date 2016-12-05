@@ -1,0 +1,30 @@
+1. faceti o lista cu numele, marimea in bytes si starea segementelor din sesiunea curenta
+select a. name, b.rssize, b.status 
+from v$rollname a
+INNER JOIN v$rollstat b
+ON a.USN = b.USN;
+
+2. faceti o inserare in tabela emp, apoi faceti o lista cu adresa tranzactiei, segmentul de rollback pe care il foloseste, numarul
+de blocuri generate si numele fisierului de rollback utilizat.
+
+insert into emp values (1000, 'TEST','TRANZACT',1111,sysdate, 100,0,10);
+select a.addr, a.xidusn, a.used_ublk, b.file_name
+from v$transaction a 
+left join dba_data_files b
+on a.start_ubafil = b.file_id;
+
+3. faceti o lista cu useru current, adresa sesiunii, adresa tranzactiei si numarul segmentului de rollback folosit in 
+sesiunea curenta
+
+select a.username, a.saddr, b.addr, b.start_ubablk 
+from v$session a
+inner join v$transaction b
+on a. saddr = b.ses_addr;
+
+4. faceti o lista cu numele, tipul si starea tablespace+ului alocat pt segmentele temporare de sortare din sesiunea curenta precum
+si nr maxim de blocuri de sortare alocate fiecarui segment temporar.
+
+select a.tablespace_name, a.max_sort_size,a.max_sort_blocks, b.contents 
+from v$sort_segment a 
+inner join dba_tablespaces b
+on a.tablespace_name = b.tablespace_name;

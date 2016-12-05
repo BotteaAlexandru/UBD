@@ -1,0 +1,18 @@
+1. sa se creeze un table space temp temp_ubd care sa aibe un fisier de date ubd1.dbf cu dimensiunea de 2 mega si cu o extensie uniforma de 1 M
+
+CREATE TEMPORARY TABLESPACE temp_ubd TEMPFILE 'E:/Student/ubd01.dbf'
+SIZE 2M EXTENT MANAGEMENT LOCAL UNIFORM SIZE 1M;
+
+2. sa se arate din dictionar numele, fisierul si starea tablespace-ului permanent aferent userului curent.
+
+ select default_tablespace from dba_users where username like 'UBD1';
+select file_name, tablespace_name, status from dba_data_files where tablespace_name =  (select default_tablespace from dba_users where username like 'UBD1');
+
+3. sa se arate din dictionar, numele tablesapce-urilor permanente si temporare setate ca default. Afisam: numele, proprietatea si descrierea lor.
+
+select tablespace_name, contents from dba_tablespaces where tablespace_name in (select distinct default_tablespace from dba_users) and contents IN ('PERMANENT', 'TEMPORARY'); 
+
+4. sa se adauge un nou fisier de date ubd2 cu dimensiunea de 1 MB la tablespace-ul bd_data si apoi sa se verifice in dictionar daca a fost creat.
+
+ALTER TABLESPACE bd_data ADD DATAFILE 'E:/Student/ubd2.dbf' SIZE 1M;
+select * from dba_data_files where tablespace_name like 'BD_DATA'

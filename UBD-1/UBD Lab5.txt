@@ -1,0 +1,20 @@
+1. Sa se creeze un tablespace temporar UBDTEMP, care sa aiba un fisier de date UBD1 cu dimensiunea de 2 MB, creat in folderul C:\Student
+
+REZOLVARE: create temporary tablespace UBDTEMP tempfile 'E:/Student/ubd.dbf' SIZE 2M;
+
+2. sa se arate din dictionar numele, fisierul si starea tablespaceu-lui permanent aferent userului curent.
+
+REZOLVARE: select file_name, status from DBA_DATA_FILES where tablespace_name in (select default_tablespace from DBA_USERS where username='SCOTT');
+
+--- la mine utilizatorul curent era SCOTT
+
+3. Sa se adauge un nou fisier de date UBD12 cu dimensiunea de 1 M la tablesapce_ul permanent curent si apoi sa se verifice in dictionar daca a fost creat.
+
+REZOLVARE: alter tablespace USERS add datafile 'UDB12.dbf' size 1M;
+
+select tablespace_name, file_name from DBA_DATA_FILES where tablespace_name
+='USERS';
+
+4. Sa se arate din dictionar numele tablespaces-urilor permanente si temporare setate ca default 
+
+select property_name,property_value from database_properties where property_name in ('DEFAULT_TEMP_TABLESPACE','DEFAULT_PERMANENT_TABLESPACE');

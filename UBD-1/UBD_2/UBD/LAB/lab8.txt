@@ -1,0 +1,110 @@
+//lista cu toate tabele din tablespaceul aferent userului curent
+ select owner,tablespace_name, table_name
+ from dba_tables where owner='UBD1';
+
+//aflarea tipurilor de obiect din dictionar
+select object_type from dba_objects group by object_type;
+
+//lista cu indexii din baza de date in anul 2008
+ select OBJECT_NAME , CREATED, OBJECT_TYPE 
+ from dba_objects 
+ where object_type='INDEX' and created between '01-JAN-08' and '31-DEC-08';
+
+//dezactivare coloana de comision
+ALTER TABLE emp11
+SET UNUSED COLUMN sal
+CASCADE CONSTRAINTS;
+
+//selectare numar de coloana nefolosite pentru tabela emp11
+ select * from dba_unused_col_tabs where table_name='EMP11';
+
+//numele instanteicurente, tablespaceul aferent userului curent , numele tabelelor si numele instantei
+select a.TABLE_NAME, a.TABLESPACE_NAME , b.INSTANCE_NAME ,b.HOST_NAME
+from dba_tables a , v$instance b 
+where a.OWNER='UBD1' and
+      a.INSTANCES=b.INSTANCE_NUMBER;
+
+
+CREATE GLOBAL TEMPORARY TABLE
+hr.employees_temp
+AS SELECT * FROM hr.employees;
+
+ALTER TABLE hr.employees
+PCTFREE 30
+PCTUSED 50
+STORAGE(NEXT 500K
+MINEXTENTS 2
+MAXEXTENTS 100);
+
+ALTER TABLE hr.employees
+ALLOCATE EXTENT(SIZE 500K
+DATAFILE ‘/DISK3/DATA01.DBF’);
+
+ALTER TABLE emp_test
+DROP COLUMN comm
+CASCADE CONSTRAINTS CHECKPOINT 1000;
+
+ALTER TABLE emp_test
+RENAME COLUMN sal
+TO salary;
+
+ALTER TABLE emp_test
+SET UNUSED COLUMN comm
+CASCADE CONSTRAINTS;
+
+
+SELECT object_name, created
+FROM DBA_OBJECTS
+WHERE object_name like 'EMP%' AND owner = 'SCOTT';
+
+
+ALTER INDEX emp_name_idx
+DEALLOCATE UNUSED;
+
+CREATE INDEX emp_name_idx
+ON emp(ename)
+PCTFREE 30
+STORAGE(INITIAL 200K NEXT 200K
+PCTINCREASE 0 MAXEXTENTS 50)
+TABLESPACE bd_data;
+
+ALTER INDEX emp_name_idx
+MONITORING USAGE
+
+ALTER INDEX emp_name_idx
+NOMONITORING USAGE
+
+//admin tabelelor
+faceti o lista cu numelele tabelelor tbspace aferent perm si proprietarul ptr toate tabelele din userul curent
+
+SELECT owner, tablespace_name,table_name FROM dba_tables
+WHERE owner = 'UBD1'
+
+//faceti o lista cu numele tipul si data creeari tuturor trigerilor din baza de date creati in anul 2002
+
+ select OBJECT_NAME , CREATED, OBJECT_TYPE 
+ from dba_objects 
+ where object_type='TRIGGER' and created between '01-JAN-02' and '31-DEC-02';
+ 
+//verificati in dict nr de blocuri alocate unui index si care este procentul utilizat din spatiul alocat
+ANALYZE INDEX emp_name_idx VALIDATE STRUCTURE;
+SELECT name, blocks, used_space, pct_used
+FROM index_stats ;
+
+//afisati din dictionar numele instantei curente numele indecsilor si tabelele aferente
+desc v$instance;
+
+select a.TABLE_NAME, b.INSTANCE_NAME 
+from dba_tables a, v$instance b
+where OWNER='UBD1' and a.;
+
+
+
+select a.TABLE_NAME, b.INSTANCE_NAME 
+from dba_tables a , v$instance b 
+where a.OWNER='UBD1' and
+      a.INSTANCES=b.INSTANCE_NUMBER;
+
+select a.index_name, a.table_name, b.instance_name 
+from dba_indexes a, v$instance b 
+where a.instances=b.instance_number;

@@ -1,0 +1,261 @@
+SET LINES 150;
+SET PAGES 150;
+
+desc v$logfile;
+select * from v$logfile;
+desc v$database;
+select name,log_mode from v$database;
+DESC V$PARAMETER;
+SELECT name FROM V$PARAMETER;
+SELECT * FROM V$PARAMETER WHERE name='db_name';
+desc v$thread;
+select groups, sequence#, instance, status from v$thread;
+SELECT * FROM v$THREAD;
+desc v$log;
+select group#,members,archived,status from v$log;
+alter database add logfile member 'e:\temp\log2.rdo' to group 1;	!!
+select * from v$logfile;
+alter database drop logfile member 'e:\temp\LOG2.RDO';		(nu e valid)
+
+
+********************************************************
+EXERCITII:
+
+1)
+Sa se arate din dictionar data cand a fost creata baza de date curenta 
+si data cand au fost resetate fisierele de log (data sa fie in format ora-minut-secunda)
+
+SELECT to_char(enable_time, 'DD-MM-YYY HH:MI:SS') data_creare FROM V$THREAD;
+SELECT to_char(resetlogs_time,  'DD-MM-YYY HH:MI:SS') data_reset FROM V$DATABASE;
+
+
+2) Sa se arate din dictionar numele instanei curente si grupurile fisierelor de log aflate in starea open;
+
+
+SELECT value nume FROM V$PARAMETER WHERE name='db_name' ;
+SELECT * FROM V$LOG WHERE status='OPEN';
+
+SELECT instance, status, current_group# FROM V$THREAD;
+
+
+3) Sa se aratre din dictionar care este structura tabelara a tabelei emp din userul curent.
+
+
+SELECT table_name FROM user_tables;
+
+
+4) Sa se creeze o cheie externa pe tabla emp ca fiind o relatie pe coloana deptno din tabela dept;
+Apoi sa se verifice in dictionar daca a fost creata constrangerea prin vizualizarea tuturor constrangerilor
+aferente userului ubd1.
+
+
+DESC V$PARAMETER;
+DESC V$THREAD;
+DESC V$DATABASE;
+
+
+
+1. sa se arata din dictionar numele instantei curente, host, data startarii si starea instantei;
+
+select a.instance, TO_CHAR(a.open_time,'DD:MM:YYYY'),TO_CHAR(a.open_time,'HH:MI:SS'),
+	 a.status,b.host_name from v$thread a, v$instance b where a.instance = b.instance_name;
+
+2.sa se artae din dictionar numele si starea instantei curente si data ultimului checkpoit in format cu ora, minut, secunda;
+
+ select instance,status,TO_CHAR(checkpoint_time,'DD:MM:YYYY'),TO_CHAR( checkpoint_time,'HH:MI:SS') from v$thread;
+
+3. care sunt grantificarile facute de userul scott si pe ce tabele si cine e beneficiarul;
+
+SELECT TABLE_NAME, PRIVILEGE, GRANTEE FROM USER_TAB_PRIVS WHERE GRANTOR = 'SCOTT';
+
+4.care sunt tabelele la care proprietar e userul ubd1
+
+select table_name from user_tables;
+select owner, object_name from all_objects where owner = 'UBD1' and object_type = 'TABLE';
+
+
+
+
+
+***************************************
+
+LAb .5 
+
+1)
+
+CREATE TABLESPACE userdata DATAFILE 'E:/Student/userdata01.dbf' SIZE 1M 
+EXTENT MANAGEMENT LOCAL UNIFORM SIZE 128K;
+
+CREATE TABLESPACE UBD DATAFILE 'E:/Student/ubd1.dbf' SIZE 1M;
+
+
+2) Informatii despre tablespace-uri (la nivel de baza de date)
+DESC DBA_TABLESPACES;
+SELECT tablespace_name,block_size,status FROM DBA_TABLESPACES;
+
+
+3) Starea unui tablespace (existent sau sters din baza de date)
+DESC V$TABLESPACE;
+SELECT * FROM V$TABLESPACE;
+
+
+4) Informatii despre tablespace-uri si fiserele de date aferente (la nivelul bazei de date)
+DESC DBA_DATA_FILES;
+SELECT tablespace_name, file_name, status FROM DBA_DATA_FILES;
+
+
+5) Informatii despre fisierele de date (la nivel de baza de date)
+DESC V$DATAFILE;
+SELECT file#, name, creation_time, status, enabled FROM V$DATAFILE;
+
+
+6) Informatii despre fisierele de date temporare la nivel de baza de date
+DESC DBA_TEMP_FILES;
+SELECT file_name, tablespace_name, status FROM DBA_TEMP_FILES;
+
+
+7) Informatii despre fisierele temporare la nivel de user
+DESC V$TEMPFILE;
+SELECT file#, name, creation_time, status FROM V$TEMPFILE;
+
+
+
+CREATE TABLESPACE userdata DATAFILE 'E:/Student/userdata02.dbf' SIZE 1M
+EXTENT MANAGEMENT LOCAL UNIFORM SIZE 128K;
+
+SELECT tablespace_name FROM DBA_TABLESPACES;
+SELECT tablespace_name FROM DBA_TEMP_FILES;
+
+DESC V$THREAD;
+DESC V$SESSION;
+DROP TABLESPACE userdata INCLUDING CONTENTS AND DATAFILES;
+
+SELECT name FROM V$DATAFILE;
+SELECT file#, enabled, ts#, name, aux_name FROM V$DATAFILE;
+SELECT name, aux_name FROM V$DATAFILE;
+
+
+
+DESC  V$DATABASE;
+DESC V$DATAFILE;
+DESC V$DATAFILE_HEADER;
+
+select username,default_tablespace from dba_users where username like 'UBD1';
+select tablespace_name, file_name FROM dba_data_files where tablespace_name like 'BD_DATA';
+
+ alter tablespace BD_DATA add datafile 'E:\Student\udb12.file' size 1M
+ select tablespace_name, file_name FROM dba_data_files where tablespace_name like 'BD_DATA';
+
+select property_value from database_properties where property_name like '%DEFAULT%'
+UNION
+select default_tablespace from dba_users,dba_tablespaces where default_tablespace=tablespace_name and contents like '%PERMANENT';
+
+------------
+EXERCITII:
+-----------
+
+
+1) Sa se creeze un tablespace temporar ubd_temp,   care sa aibe un fisier de date ubd cu dimensiune de 2M.
+
+CREATE TEMPORARY TABLESPACE ubdtemp tempfile 'E:/Student/ubd1.ddd' SIZE 2M;
+
+2) Sa se arate din dictionar numele, fisierul si starea tablespace-ului permanent aferent userului curent.
+a) aflam user curent
+b) info despre tablespace respectiv
+
+
+DESC dba_users;
+DESC dba_data_files;
+SELECT username FROM dba_users WHERE username LIKE 'UBD1'
+SELECT tablespace_name, file_name, status FROM dba_data_files 
+WHERE tablespace_name LIKE 'BD_DATA' ;
+
+
+SELECT a.username, b.tablespace_name, b.file_name, b.status  
+FROM dba_users a, dba_data_files b
+WHERE a.username LIKE 'UBD1' AND b.tablespace_name LIKE 'BD_DATA' ;
+
+
+3) Sa se adauge un fis de date ubd12, cu dimens 1M la tablesapce-ul permanent aferent userului curent, si apoi sa se verifice in dictionar daca a fost creat
+
+ALTER tablespace BD_DATA ADD datafile 'E:\Student\udb12.file' size 1M;
+SELECT tablespace_name, file_name FROM dba_data_files WHERE tablespace_name LIKE'BD_DATA';
+
+
+4) Sa se dictionar care este cel mare fisier temporar (ca nr de bytes), data cand a fost creat (format ora-min-sec) si starea lui(online sau offline)
+
+SELECT to_char(created,  'DD-MM-YYY HH:MI:SS') data_creare FROM dba_users
+WHERE username LIKE 'UBD1' AND temporary_tablespace LIKE 'BD_TEMP';
+
+SELECT file_name FROM dba_data_files WHERE bytes=(SELECT max(bytes) FROM dba_data_files);
+
+
+SELECT a.file_name, a.status, to_char(b.created,  'DD-MM-YYY HH:MI:SS') data_creare 
+FROM dba_data_files a,  dba_users b
+WHERE bytes=(SELECT max(bytes) FROM dba_data_files) AND
+b.username LIKE 'UBD1' AND b.temporary_tablespace LIKE 'BD_TEMP';
+
+
+
+=======================================
+LAB 18.11.2010
+
+1) Informatii despre parametrii si starea unui tablespace
+DESC dba_tablespaces;
+SELECT tablespace_name, block_size, initial_extent, min_extents, max_extents, status
+FROM dba_tablespaces WHERE tablespace_name='PBD_DATA';
+
+SELECT tablespace_name FROM dba_tablespaces;
+SELECT tablespace_name, block_size, initial_extent, min_extents, max_extents, status
+FROM dba_tablespaces WHERE tablespace_name='BD_DATA';
+
+2) Informatii despre segmentele (obiectele) unui tablespace
+SELECT owner, segment_name, segment_type, tablespace_name, blocks, extents
+FROM dba_segments WHERE owner='SCOTT' AND segment_type='TABLE';
+
+DESC dba_segments;
+4) Informatii despre blocurile libere dintr-un tablespace
+SQL> desc dba_free_space
+
+SQL> select tablespace_name, count(*), max(blocks), sum(blocks) from dba_free_space
+group by tablespace_name;
+
+SQL> ALTER TABLESPACE PBD COALESCE ;
+
+SQL> select tablespace_name,total_extents,percent_extents_coalesced from dba_free_space_coalesced;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,18 @@
+1. faceti o lista cu numele tabelelor, tablespace-ul permanent aferent si proprietarul pt toate tabelele din userul curent.
+
+SELECT table_name, tablespace_name, owner FROM dba_tables WHERE owner = 'UBD1';
+
+
+2. lista cu numele, tipul si data crearii tuturor triggerilor din baza de date creati in anul 2002.
+
+select object_name, object_type, created from dba_objects where object_type = 'TRIGGER' and to_char(created, 'YYYY') = 2002;
+
+3. verificati in dictionar numarul de blocuri alocate unui index si care este procentul utilizat din spatiul alocat.
+
+ANALYZE INDEX scott.emp_name_idx VALIDATE STRUCTURE;
+SELECT name, blocks, used_space, pct_used
+FROM index_stats  WHERE name = 'EMP_NAME_IDX';
+
+4. afisati din dictionar numele instantei curente, numele indecsilor si tabelele aferente.
+
+SELECT index_name, table_name, instance_name from dba_indexes a INNER JOIN v$instance b ON a.instances = b.instance_number ; 

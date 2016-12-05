@@ -1,0 +1,62 @@
+
+1 select segment_name,segment_type, tablespace_name, blocks
+          from dba_segments where owner='SCOTT'and segment_type='INDEX'
+/
+
+2 select tablespace_name, sum(blocks)  from dba_free_space 
+where tablespace_name='PBD_DATA'
+group by tablespace_name
+/
+
+3 create table emp_ubd as select * from emp;
+
+select owner,segment_name,segment_type, tablespace_name, blocks, extents
+          from dba_segments where segment_name='EMP_UBD' and segment_type='TABLE'
+/
+
+4  select tablespace_name,  sum(blocks) from dba_free_space where tablespace_name='PBD_DATA' group by tablespace_name
+/
+drop table emp_ubd;
+
+select tablespace_name,  sum(blocks) from dba_free_space where tablespace_name='PBD_DATA' group by tablespace_name
+
+-------------------------------------------------------------------------------
+Care este spatiul liber ca numar de blocuri in tablespace-ul permanent afferent
+userului current.
+
+select tablespace_name, sum(blocks) from dba_free_space where
+tablespace_name='BD_DATA' group by tablespace_name;
+
+Sa se creeze o copie a tabelei emp numita emp1_ubd apoi sa se arate din dictionar
+proprietarul , numele, tipul si marimea in blocuri aacestei tabele;
+
+create table emp1_ubd as select * from emp;
+
+select owner, segment_name,segment_type, blocks from dba_segments where
+segment_name='EMP1_UBD’;
+
+care sunt tabelele partitionate aferente userului system;
+
+select owner, partition_name from dba_segments where segment_type='TABLE
+PARTITION' and owner='SYSTEM';
+
+sa se arate din dictionary cea mai mare extensie de segment de rollback, numele txt
+in care este creat segmental si dimensuinea in bytes a extensiei;
+
+select segment_name, tablespace_name, bytes from dba_segments
+where segment_type='ROLLBACK' and extents= (select max(extents) from
+dba_segments where segment_type='ROLLBACK' group by tablespace_name)
+-------------------------------------------------------------------------------
+1. sa se creeze o copie a tabelei emp emp12 si sa se arate din dictionar proprietarul, numele, tipul si marimea in blocuri a acestei tabele
+create table emp1_ubd as select * from emp;
+select owner, segment_name,segment_type, blocks from dba_segments where segment_name='EMP12';
+
+2. sa se arate din dictionar marimea in bytes si blocuri a tablespaceului temporar aferent userului curent si in ce fisier este create spatiul respectiv
+select * from dba_users where username = 'ubd1';
+select FILE_NAME, BYTES, BLOCKS from DBA_TEMP_FILES where TABLESPACE_NAME = 'BD_TEMP';
+
+3. sa se arate cea mai mare extensie de segmente rollback, numele tablespaceului pe care e vreat segmentul si dimensiunea in bytes a extensiei
+select segment_name, tablespace_name, bytes from dba_segments where segment_type='ROLLBACK' and extents= (select max(extents) from dba_segments where segment_type='ROLLBACK' group by tablespace_name)
+
+4.sa se arate din dictionar numele tablespaceului permanent afernt userului curent si care e extensia initiala a lui;
+select tablespace_name, initial_extent from DBA_TABLESPACES where tablespace_name = 'BD_DATA';

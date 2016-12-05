@@ -1,0 +1,5 @@
+select a.instance_name, b.owner, b.table_name, b.tablespace_name, 
+	b.max_extents from dba_tables b, v$instance a, database_properties c 
+	where b.owner='SCOTT' AND
+	b.tablespace_name = c.property_value and
+	c.property_name like 'DEFAULT%PERMANENT%TABLESPACE';

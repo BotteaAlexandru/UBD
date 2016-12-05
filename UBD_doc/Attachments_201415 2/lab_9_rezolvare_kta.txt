@@ -1,0 +1,76 @@
+
+
+* creeare index arbore : 
+
+CREATE INDEX scott.emp_name_idx
+ON scott.emp(ename)
+PCTFREE 30
+STORAGE(INITIAL 200K NEXT 200K
+PCTINCREASE 0 MAXEXTENTS 50)
+TABLESPACE bd_data;
+
+* creare index bitmap (binar) 
+
+CREATE BITMAP INDEX scott.dept_name_idx
+ON scott.dept(dname)
+PCTFREE 30
+STORAGE(INITIAL 200K NEXT 200K
+PCTINCREASE 0 MAXEXTENTS 50)
+TABLESPACE bd_data;
+
+* modificare parametri 
+
+ALTER INDEX scott.emp_name_idx
+STORAGE(NEXT 400K
+MAXEXTENTS 100);
+
+	* informatii despre indecsi :
+	dba_indexes
+
+	* informatii despre coloanele indecsilor :
+	dba_ind_columns
+
+	* informatii despre starea indecsilor
+	index_stats
+
+* start monitorizare index : 
+ALTER INDEX emp_name_idx
+MONITORING USAGE
+
+* stop monitorizare index : 
+ALTER INDEX emp_name_idx
+NOMONITORING USAGE
+
+* informatii despre indecsii monitorizati
+desc v$object_usage
+
+* start analiza structura unui index -> index_stats
+ANALYZE INDEX emp_name_idx VALIDATE STRUCTURE
+----------------------------
+
+1. creare index arbore, pe coloanele deptno si empno ale tabelei emp_copy.
+ARATATI DIN DICTIONAR componenta indexului.
+
+create table emp_copy as  select * from emp;
+create index emp_copy_idx ON emp_copy(deptno,empno); TABLESPACE test_lab10;
+SELECT index_name, index_type, table_name, status from dba_indexes WHERE index_name='EMP_COPY_IDX';
+
+2. aratati din dictionar, numarul de blocuri alocate si care e procentul
+utilizat din spatiul alocat lui
+
+ANALYZE INDEX emp_copy_idx VALIDATE STRUCTURE;
+
+SELECT name, blocks, used_space, pct_used
+FROM index_stats 
+
+3. aratati din dictionar numele instantei curente, numele indexilor si tabelele
+pe care au fost creeati 
+
+SELECT instance_name, index_name, table_name FROM dba_ind_columns, v$instance WHERE  index_owner = 'SYSTEM';
+
+
+4. monitorizati indexul creat si aratati din dictionar data si ora cand a inceput monitorizarea.
+pana la secunda
+
+alter index_emp_copy_idx MONITORING USAGE;
+select start_monitoring, index_name from v$object_usage where table_name = 'EMP_COPY';

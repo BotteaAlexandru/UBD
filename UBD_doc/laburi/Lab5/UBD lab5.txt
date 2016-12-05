@@ -1,0 +1,85 @@
+1.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1) sa se creeze un tablespace temporar ubdtemp care sa aiba un fisier de date ubd1 cu dimensiunea de 2 MB creat in 
+folderul student pe discul E
+
+create temporary tablespace ubdtemp tempfile 'E:/Student/ubd1.ddd' size 2M;
+
+2) sa se arate din dictionar numele fisierului si starea tablespace permanent aferent userului curent;
+
+select username,default_tablespace from dba_users where username like 'UBD1';
+select tablespace_name, file_name FROM dba_data_files where tablespace_name like 'BD_DATA';
+
+3) sa se adauge un nou fisier de date ubd12 cu dimensiunea de 1 M la tablespace permanent curent si apoi
+sa se verifice in dictionar daca a fost creat
+
+ alter tablespace BD_DATA add datafile 'E:\Student\udb12.file' size 1M
+ select tablespace_name, file_name FROM dba_data_files where tablespace_name like 'BD_DATA';
+
+4) sa se arate din dictionar numele tablespaceuri permanente si temporare setate ca default;
+select property_value from database_properties where property_name like '%DEFAULT%'
+UNION
+select default_tablespace from dba_users,dba_tablespaces wherdefault_tablespace=tablespace_name and contents like '%PERMANENT';
+
+-----------------------------------------------------------------------------------------------------
+
+1. sa se creze un tablespace temporar UBDTEMP care sa iaba un fisier de date UBD1 cu dimensiunea de 2m, create in E:/STUDENT
+CREATE TEMPORARY TABLESPACE TEMP_UBD TEMPFILE 'E:/student/UBD' SIZE 2M;
+
+2. sa se arate din dictionar numele, fisierul si starea tabelspaceului permanent afertent userului curent
+select DEFAULT_TABLESPACE from dba_users where user = 'UBD1';
+
+3. sa se adauge un nou fisier de date UBD12 cu dimensiunea de 1M la tablespaceul permanet curentsi apoi sa se verifice in dictionar daca a fost creat.
+ALTER TABLESPACE BD_DATA ADD DATAFILE 'E:/student/ubd12' SIZE 5M;
+select file#, name, bytes from V$DATAFILE;
+
+4. sa se arate din dictionar numele tablespaceurile permanente si temporare setate ca default
+select *from DATABASE_PROPERTIES where PROPERTY_NAME = 'DEFAULT_TEMP_TABLESPACE' 
+or  PROPERTY_NAME='DEFAULT_PERMANENT_SPACE';
+
+-----------------------------------------------------------------------------------------------------------
+1. sa se creeze un tablespace de tip undo 'undo_ubd' cu un fis de date 'undo1' cu dim de 1M (pe e:/student)
+	CREATE UNDO TABLESPACE undo_ubd
+			DATAFILE 'E:/Student/undo1' SIZE 1M
+
+2. Sa se arate din dict numele, fisierul si starea tablespace-ului permanent curent aferent userului curent
+	select tablespace_name,file_name,status from DBA_DATA_FILES
+------------------------------------------------------------------------------------------------
+1 sa se creeze un tavblespace temp temp_ubd fisier date ubd1 cu dim de 2 m
+    create temporary tablespace temp_ubd tempfile 'E:/Student/ubd1' size 2M;
+
+2 sa se mareasca dim fis ubd1 la 4 M si apoi sa se verifice in dictionar noua dimensiune
+    alter database tempfile 'E:/Student/ubd1' resize 5M
+    select * from dba_temp_files where tablespace_name = 'TEMP_UBD';
+
+3 sa se afiseze din dictionar numele fis temporare aferente userului curent aflarunte in starea online , data cand au fost create si dimensiuneaa lor in blocuri
+    select name,creation_time, block_size from V$tempfile where status = 'ONLINE'
+
+4 aratati din dictionar care este cel mai mare fisier temporar ca numar de bytes aferent userului curent, data cand a fost crstatueat si starea lui
+    select name, creation_time, status, bytes from v$tempfile where bytes = (select max(bytes) from v$tempfile)

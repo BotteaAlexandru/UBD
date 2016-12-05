@@ -1,0 +1,168 @@
+1) Crearea unui tablespace permanent ‘UBD’ cu un fisier de date UBD1 cu dimensiunea de 1 M, cu
+sau fara extensie :
+
+
+SQL> CREATE TABLESPACE userdata DATAFILE 'E:/Student /userdata01.dbf’ SIZE 1M
+EXTENT MANAGEMENT LOCAL UNIFORM SIZE 128K;
+
+
+SQL >create tablespace UBD
+datafile 'E:/Student/ubd1.dbf' SIZE 1M;
+
+
+2)Informatii despre tablespace-uri (la nivel de baza de date)
+
+	desc DBA_TABLESPACES
+
+	SQL> select tablespace_name,block_size,status from DBA_TABLESPACES;
+
+3) Starea unui tablespace (existent sau sters din baza de date)
+	SQL> desc V$TABLESPACE
+
+	select * from V$TABLESPACE;
+
+4) Informatii despre tablespace-uri si fiserele de date aferente (la nivelul bazei de date)
+	SQL> desc DBA_DATA_FILES;
+	SQL> select tablespace_name,file_name,status from DBA_DATA_FILES
+
+5) Informatii despre fisierele de date (la nivel de baza de date)
+	SQL> desc V$DATAFILE
+	SQL> select file#,name,creation_time,status,enabled from V$DATAFILE;
+
+6)Informatii despre fisierele de date temporare la nivel de baza de date
+	SQL> desc DBA_TEMP_FILES
+	select file_name,tablespace_name, status from DBA_TEMP_FILES;
+
+7) Informatii despre fisierele temporare la nivel de user
+	SQL> select file#,name, creation_time, status from V$TEMPFILE;
+
+------------------------------------------------------------------------------------
+
+
+Lab 6 
+
+1) Informatii despre segmentele (obiectele) unui tablespace
+	SQL> select owner,segment_name,segment_type, tablespace_name, blocks, extents
+		from dba_segments where owner='SCOTT'and segment_type='TABLE'
+
+2)Informatii despre extensiile segmentelor
+	SQL> desc dba_extents
+	SQL> select owner, segment_name, segment_type, tablespace_name, bytes from dba_extents
+		where owner='SCOTT' and segment_name='EMP';
+
+
+3) Informatii despre blocurile libere dintr-un tablespace
+	SQL> desc dba_free_space
+
+	SQL> select tablespace_name, count(*), max(blocks), sum(blocks) from dba_free_space
+	group by tablespace_name;
+
+4) Unificarea spatiilor contigue dintr-un tablespace
+	
+	SQL> ALTER TABLESPACE PBD COALESCE ;
+	SQL> select tablespace_name,total_extents,percent_extents_coalesced from dba_free_space_coalesced;
+
+
+Lab 7 
+
+
+1) Crearea si stergerea unui segment de rollback
+
+	SQL> 	create rollback segment ubd tablespace BD_DATA
+		storage (initial 100k next 100k optimal 4M minextents 20 maxextents 100);
+
+2) Informatii din dictionar privind segmentele de rollback
+	SQL> desc dba_rollback_segs
+	SQL> select segment_name,tablespace_name,owner,status from dba_rollback_segs;
+
+3) Segmentele folosite de instanta curenta
+	SQL> desc v$rollname
+	SQL> select * from v$rollname;
+
+4) Statistici despre segmentele de rollback
+	SQL> desc v$rollstat
+	SQL> select usn, rssize, extents, status from v$rollstat;
+
+5) Informatii despre useri si sesiuni
+	SQL> desc v$session
+	SQL> select username, sid, saddr from v$session;
+
+6) Informatii despre tranzactii( adresele tranzactiilor pot fi join-ate cu sesiunile prin ses_addr).
+	SQL> desc v$transaction
+
+	ADDR – adresa sesiunii
+XIDUSN – nr. segmentului de rollback
+USED_UBLK – nr. de blocuri de UNDO generate de tranzactie
+START_UEXT- extensia segmentului de rollback pentru care tranzactia a inceput scrierea
+START_UBAFIL – fisierul de rollback pentru care tranzactia a inceput scrierea
+
+
+7) Informatii despre segmentele temporare de sortare (folosite in comenzile SQL de sortare)
+
+	SQL> desc v$sort_segment
+	SQL> select tablespace_name,max_sort_size,extent_size,max_sort_blocks from v$sort_segment;
+
+8) Informatii despre sesiuni si tablespace-ul in care se afla segmentele temporare de sortare folosite
+in sesiunea curenta
+	SQL> desc v$sort_usage
+	SQL> select username,user,tablespace,contents,extents,blocks from v$sort_usage;
+
+9) Setarea zonei de memorie utilizata pentru sortare in sesiunea curenta la 10K.
+	SQL> alter system set sort_area_size=10240 deferred;
+
+Lab 8 
+
+
+1) Vizualizarea ID-rilor pentru fiecare linie din tabela.
+	
+	SQL> CREATE TABLE emp_test as select * from scott.emp;
+
+2) Alocarea unei extensii la o tabela
+	
+	ALTER TABLE scott.emp_test
+	ALLOCATE EXTENT(SIZE 500K
+	DATAFILE ’e:/DISK3/DATA01.DBF’);
+
+3) Stergerea unei coloane dintr-o tabela
+	
+	ALTER TABLE scott.emp_test
+	DROP COLUMN comm
+	CASCADE CONSTRAINTS CHECKPOINT 
+
+4) Redenumirea unei coloane dintr-o tablela
+	
+	ALTER TABLE scott.emp_test
+	RENAME COLUMN sal
+	TO salary;
+
+5)Dezactivarea unei coloane dintr-o tabela
+	
+	ALTER TABLE scott.emp_test
+	SET UNUSED COLUMN comm
+	CASCADE CONSTRAINTS;
+
+6) Stergerea din dictionar a coloanelor dezactivate dintr-o tabela
+	
+	ALTER TABLE scott.emp_test
+	DROP UNUSED COLUMNS CHECKPOINT 1000;
+
+7)
+SQL> desc dba_unused_col_tabs;
+SQL> SELECT * FROM dba_unused_col_tabs;
+
+
+8) Informatii despre tabelele din baza de date
+	SQL> desc dba_tables;
+
+	SQL>SELECT owner, tablespace_name,table_name FROM dba_tables
+	WHERE owner = 'SCOTT'
+
+9) Informatii despre obiectele din baza de date
+	SQL> desc dba_objects
+
+	SQL> SELECT object_name, created
+	FROM DBA_OBJECTS
+	WHERE object_name like ’EMP%’ AND owner = ‘SCOTT’;
+
+Lab 9 
+

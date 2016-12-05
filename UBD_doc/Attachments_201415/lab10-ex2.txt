@@ -1,0 +1,6 @@
+alter tablespace users
+add datafile 'D:/app/Tablespaces/ubd3.dbf'
+size 1M;
+
+alter index emp1_idx
+allocate extent(size 100k datafile 'D:/app/Tablespaces/ubd3.dbf');

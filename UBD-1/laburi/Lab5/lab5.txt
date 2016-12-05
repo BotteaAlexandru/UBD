@@ -1,0 +1,16 @@
+1.sa se creeze un tablespace de tip undo numit undo_ubd11 care sa aiba un fis de data undo11 cu dim de un 1M e:\\student
+CREATE UNDO TABLESPACE undo_ubd
+			DATAFILE 'E:/Student/undo1' SIZE 1M
+2.sas se arate din dcitionar numele fisierul si starea tablesaceului permanenet aferent userului curent
+select tablespace_name, status from dba_tablespaces where tablespace_name = 
+(select default_tablespace from dba_users where username = 'UBD1')
+/
+
+
+3 sa se arate din dictionar numele table_space permanenete si temporare setate ca default
+select property_value from database_properties where property_name like '%DEFAULT%'
+UNION
+select default_tablespace from dba_users,dba_tablespaces where default_tablespace=tablespace_name and contents like '%PERMANENT';
+
+4 .aratati din dictionar care e cel mai mare fis temp nr bytes aferent userului curent data creerii si starea lui
+ select name, creation_time, status, bytes from v$tempfile where bytes = (select max(bytes) from v$tempfile)
